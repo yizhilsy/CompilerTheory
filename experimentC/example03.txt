@@ -1,0 +1,70 @@
+PROGRAM LexicalAnalyzer;
+
+CONST
+    LETTER = 0;
+    DIGIT = 1;
+    OTHER = 2;
+    IDENT = 3;
+    NUMBER = 4;
+    DELIMITER = 5;
+    OPERATOR = 6;
+
+VAR
+    ch: CHAR;
+    token: STRING[10];
+    code: INTEGER;
+
+PROCEDURE GetChar;
+BEGIN
+    IF NOT EOF THEN
+        READ(ch);
+    ELSE
+        ch := CHR(0);  (* End of file *)
+    END;
+END;
+
+PROCEDURE GetNonBlank;
+BEGIN
+    WHILE (ch = ' ') DO
+        GetChar;
+    END;
+END;
+
+PROCEDURE Concatenate;
+BEGIN
+    token := token || ch;
+END;
+
+PROCEDURE GetToken;
+BEGIN
+    code := OTHER;
+    token := '';
+    GetNonBlank;
+    IF (ISALPHA(ch)) THEN
+        code := LETTER;
+        WHILE (ISALNUM(ch)) DO
+            Concatenate;
+            GetChar;
+        END;
+    ELSIF (ISDIGIT(ch)) THEN
+        code := DIGIT;
+        WHILE (ISDIGIT(ch)) DO
+            Concatenate;
+            GetChar;
+        END;
+    ELSE
+        Concatenate;
+        GetChar;
+    END;
+END;
+
+BEGIN
+    REPEAT
+        GetToken;
+        CASE code OF
+            LETTER: WRITELN('Token: ', token, ' Code: ', code, ' (LETTER)');
+            DIGIT: WRITELN('Token: ', token, ' Code: ', code, ' (DIGIT)');
+            OTHER: WRITELN('Token: ', token, ' Code: ', code, ' (OTHER)');
+        END;
+    UNTIL (code = 0);
+END.

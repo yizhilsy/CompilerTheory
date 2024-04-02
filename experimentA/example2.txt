@@ -1,0 +1,11 @@
+Const num=100;
+Var a1,b2;
+procedure num;
+	Begin 
+		while r # 0 do
+			begin
+				Read(A1);
+				b2 := a1*2+num;
+  				write(A1,B2);
+			end
+	End.

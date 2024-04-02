@@ -1,0 +1,16 @@
+Const num=100;
+procedure gcd;
+Var a1,b2;
+Begin 
+    Read(A1);
+    b2:=a1+num+"ABC";
+    write(A1,B2);
+    2b:=num1+num2;
+    {num}
+End.
+<=
+:=
+true
+3.8
+38
+3.9a
