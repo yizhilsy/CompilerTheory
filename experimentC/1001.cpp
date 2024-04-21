@@ -27,8 +27,9 @@ std::map<std::string, std::string> pl0Symbols = {
     {"<", "lss"},{"<=", "leq"},{">", "gtr"},
     {">=", "geq"},{":=", "becomes"},
     // 界符
-    {",", "comma"},{".", "period"},{";", "semicolon"},
-    {"(", "lparen"},{")", "rparen"}
+    {"{", "lbrace"},{"}", "rbrace"},{"[", "lbracket"},{"]", "rbracket"},
+    {"(", "lparen"},{"}", "rbrace"},{"{", "lbrace"},{")", "rparen"}
+
 };
 
 

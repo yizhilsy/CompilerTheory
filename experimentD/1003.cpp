@@ -31,15 +31,13 @@ std::map<std::string, std::string> pl0Symbols = {
     {"(", "lparen"},{")", "rparen"}
 };
 
-
-
-vector<pair<string,string>> ansVec;
-
-bool isNumber(char ch){
+// 判断字符是否是数字
+bool isNumber(char ch) {
     return (ch>='0'&&ch<='9');
 }
 
-bool isStringNum(string& str){
+// 判断字符串是否是数字
+bool isStringNum(string& str) {
     for(int i=0;i<str.size();i++){
         if(!isNumber(str[i])){
             return false;
@@ -48,11 +46,13 @@ bool isStringNum(string& str){
     return true;
 }
 
-bool isLetter(char ch){
+// 判断是否是大小写字符
+bool isLetter(char ch) {
     return (islower(ch)||isupper(ch));
 }
 
-bool isDoubleNum(string& str){
+// 判断是否是浮点数
+bool isDoubleNum(string& str) {
     int pointNum = 0;
     for(int i=0;i<str.size();i++){
         if(str[i]=='.'){
@@ -71,42 +71,70 @@ bool isDoubleNum(string& str){
 // 编译程序初始化
 string init();
 
+// 词法分析
+vector<pair<string, string>> ansVec;    //存储词法分析结果
 void extractingKeywords();
-
+void compilerWork();
 void extractingIdentifiers(string& str);
 
-void compilerWork();
+// 语法分析
+void ll1SyntaxAnalysis(string& str);    // LL(1) syntax analysis
+void errorSearch(const deque<char>& synataxStr);
 
 int main()
 {
     string compileFileStr = init();
-    extractingIdentifiers(compileFileStr);
-    std::ofstream outputFile("CompilerTheory\\experimentC\\ans.txt");
-
-    for(const auto& item : ansVec){
-        outputFile<<"("<<item.first<<",    "<<item.second<<")"<<endl;
+    std::ofstream outputFile("CompilerTheory\\experimentD\\SyntaxCompilationResult.txt");
+    string checkstr;
+    int lineCt = 1;
+    for (int i = 0;i < (int)compileFileStr.size();i++) {
+        if (compileFileStr[i] == '\n') {
+            cout << lineCt++ << ":" << endl;
+            cout << checkstr << endl;
+            extractingIdentifiers(checkstr);
+            ll1SyntaxAnalysis(checkstr);
+            checkstr.clear();
+        }
+        else if (i == (int)compileFileStr.size() - 1) {
+            checkstr.push_back(compileFileStr[i]);
+            cout << lineCt++ << ":" << endl;
+            cout << checkstr << endl;
+            extractingIdentifiers(checkstr);
+            ll1SyntaxAnalysis(checkstr);
+            checkstr.clear();
+        }
+        else {
+            checkstr.push_back(compileFileStr[i]);
+        }
     }
-    system("pause");
+    
+
+    // for(const auto& item : ansVec){
+    //     outputFile<<"("<<item.first<<",    "<<item.second<<")"<<endl;
+    // }
+    // ll1SyntaxAnalysis(compileFileStr);
     return 0;
 }
 
 string init(){
     // 打开文件
-    std::ifstream file("CompilerTheory\\experimentC\\example01.txt");
+    std::ifstream file("CompilerTheory\\experimentD\\synataxAnalysis01.txt");
     // 读取文件内容到一个 std::string 对象中
     std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());    
     // 关闭文件
     file.close();
-    transform(content.begin(),content.end(),content.begin(),::tolower);
+    // 将待编译文件全部转为小写字符
+    transform(content.begin(), content.end(), content.begin(), ::tolower);
     return content;
 }
 
-void extractingIdentifiers(string& str){
-    for(int i=0;i<(int)str.length();i++){
+void extractingIdentifiers(string& str) {
+    ansVec.clear();
+    for (int i = 0;i < (int)str.length();i++) {
         // cout<<i<<endl;
         // 数字开头的标识符
-        if(isNumber(str[i])){
-            string word = string(1,str[i]);
+        if (isNumber(str[i])) {
+            string word = string(1, str[i]);
             int j=i+1;
             while(j<(int)str.size() && (isNumber(str[j]) || isLetter(str[j]) || str[j]=='.' ) ) {
                 word.push_back(str[j]);
@@ -125,7 +153,8 @@ void extractingIdentifiers(string& str){
                 cout<<word<<endl;
             }
             i = j-1;
-        }else if(islower(str[i])||isupper(str[i])){
+        }
+        else if (islower(str[i]) || isupper(str[i])) {
             int j=i;string word;
             while(j<(int)str.length() && delimiters.find(str[j])==delimiters.end()
                 && operators.find(string(1,str[j]))==operators.end() && str[j]!='\n' && str[j]!=' '){
@@ -147,7 +176,8 @@ void extractingIdentifiers(string& str){
                 ansVec.push_back(ansItem);
             }
             i = j-1;
-        }else if(str[i]=='{'){  //跳过{}内嵌的标识符及关键字
+        }
+        else if (str[i] == '{') {  //跳过{}内嵌的标识符及关键字
             string word;word.push_back('{');
             int j=i+1;
             while(j<(int)str.length()&&str[j]!='}'){
@@ -158,7 +188,8 @@ void extractingIdentifiers(string& str){
             pair<string,string> ansItem;ansItem.first = "comment";ansItem.second = word;
             ansVec.push_back(ansItem);
             i = j;
-        }else if(str[i]=='"'){  //跳过字符串之间的标识符及关键字
+        }
+        else if (str[i] == '"') {  //跳过字符串之间的标识符及关键字
             string word = string(1,str[i]);
             int j=i+1;
             while(j<(int)str.length()&&str[j]!='"'){
@@ -169,11 +200,13 @@ void extractingIdentifiers(string& str){
             pair<string,string> ansItem;ansItem.first = "string value";ansItem.second = word;
             ansVec.push_back(ansItem);
             i = j;
-        }else if( delimiters.find(str[i]) != delimiters.end() ) {
-            string word = string(1,str[i]);
+        }
+        else if (delimiters.find(str[i]) != delimiters.end()) { //寻找到了界符
+            string word = string(1, str[i]);
             pair<string,string> ansItem;ansItem.first = pl0Symbols[word];ansItem.second = word;
             ansVec.push_back(ansItem);
-        }else if( operators.find(string(1,str[i])) != operators.end() ) {
+        }
+        else if (operators.find(string(1, str[i])) != operators.end()) {    //寻找到了运算符
             if(str[i] == ':'||str[i] == '<'||str[i] == '>'){
                 // cout<<"qwe"<<endl;
                 if( (i+1)<str.size() && str[i+1]=='=' ){
@@ -192,7 +225,8 @@ void extractingIdentifiers(string& str){
                 pair<string,string> ansItem;ansItem.first = pl0Symbols[word];ansItem.second = word;
                 ansVec.push_back(ansItem);
             }
-        }else if(str[i]!=' '&&str[i]!='\n'&&str[i]!='\t'){
+        }
+        else if (str[i] != ' ' && str[i] != '\n' && str[i] != '\t') {
             // 其他非法字符
             string word(1,str[i]);
             pair<string,string> ansItem;ansItem.first = "nul";ansItem.second = word;
@@ -200,3 +234,189 @@ void extractingIdentifiers(string& str){
         }
     }
 }
+
+void ll1SyntaxAnalysis(string& str) {
+    //处理分析一行的语法
+    //构建剩余串
+    deque<char> synataxStr;
+    for (const auto& data : ansVec) {
+        if (data.first == "number") {
+            synataxStr.push_back('n');
+        }
+        else if (data.first == "ident") {
+            synataxStr.push_back('b');
+        }
+        else if (data.second == "(") {
+            synataxStr.push_back('(');
+        }
+        else if (data.second == ")") {
+            synataxStr.push_back(')');
+        }
+        else if (data.second == "+") {
+            synataxStr.push_back('+');
+        }
+        else if (data.second == "-") {
+            synataxStr.push_back('-');
+        }
+        else if (data.second == "*") {
+            synataxStr.push_back('*');
+        }
+        else if (data.second == "/") {
+            synataxStr.push_back('/');
+        }
+    }
+    deque<char> tempStr = synataxStr;
+    synataxStr.push_back('#');
+
+
+        
+        //构建预测分析表
+    unordered_map<char, int> hashmap = {
+        {'b',1},{'n',2},{'(',3},{')',4},{'+',5},{'-',6},{'*',7},{'/',8},{'#',9},
+        {'E',1},{'R',2},{'I',3},{'O',4},{'F',5},{'A',6},{'M',7}
+    };
+    //构建终结符集合
+    unordered_set<char> hashset = {
+        'b','n','(',')','+','-','*','/','#'
+    };
+    string predictTable[16][16];
+    for (int i = 1;i <= 9;i++) {
+        for (int j = 1;j <= 7;j++) {
+            predictTable[i][j] = "ERROR";
+        }
+    }
+    predictTable[1][1] = "I";predictTable[1][2] = "I";predictTable[1][3] = "I";predictTable[1][5] = "AIR";predictTable[1][6] = "AIR";
+    predictTable[2][4] = "ε";predictTable[2][5] = "AIR";predictTable[2][6] = "AIR";predictTable[2][9] = "ε";
+    predictTable[3][1] = "FO";predictTable[3][2] = "FO";predictTable[3][3] = "FO";
+    predictTable[4][4] = "ε";predictTable[4][5] = "ε";predictTable[4][6] = "ε";predictTable[4][7] = "MFO";predictTable[4][8] = "MFO";predictTable[4][9] = "ε";
+    predictTable[5][1] = "b";predictTable[5][2] = "n";predictTable[5][3] = "(E)";
+    predictTable[6][5] = "+";predictTable[6][6] = "-";
+    predictTable[7][7] = "*";predictTable[7][8] = "/";
+
+    // 进行LL(1)分析
+    stack<char> synataxSt;
+    // 初始化塞入#和E
+    synataxSt.push('#');
+    synataxSt.push('E');
+    while (synataxSt.top() != '#' || synataxStr.front() != '#') {
+        char stCh = synataxSt.top();
+        char strCh = synataxStr.front();
+        // cout << strCh << "," << stCh << endl;
+        if (hashset.find(stCh) != hashset.end() && hashset.find(strCh) != hashset.end() && stCh == strCh) { //同为终结符且相等
+            synataxSt.pop();
+            synataxStr.pop_front();
+        }
+        else if (hashset.find(stCh) != hashset.end() && hashset.find(strCh) != hashset.end() && stCh != strCh) {    //同为终结符且不等
+            cout << synataxSt.top() << " " << synataxStr.front() << endl;
+            cout << "终结符不一致" << endl;
+            cout << "Synatax Error, Please Check." << endl;
+            errorSearch(tempStr);
+            return;
+        }
+        else {  //从分析预测表中取出推理字符串
+            string expression = predictTable[hashmap[stCh]][hashmap[strCh]];
+            if (expression == "ERROR") {
+                cout << synataxSt.top() << " " << synataxStr.front() << endl;
+                cout << "空预测表" << endl;
+                cout << "Synatax Error, Please Check." << endl;
+                errorSearch(tempStr);
+                return;
+            }
+            else if (expression == "ε") {   //处理产生式右部是空的情况
+                synataxSt.pop();
+            }
+            else {
+                synataxSt.pop();
+                for (int i = (int)expression.size() - 1;i >= 0;i--) {
+                    synataxSt.push(expression[i]);
+                }
+            }
+        }
+        // //cout << synataxSt.size() << "," << synataxStr.size() << endl;
+        // if ((synataxSt.top() == '#' && synataxStr.front() != '#') || (synataxSt.top() != '#' && synataxStr.front() == '#')) {
+        //     cout << synataxSt.size() << "," << synataxStr.size() << endl;
+        //     cout << "Synatax Error, Please Check." << endl;
+        //     errorSearch(tempStr);
+        //     return;
+        // }
+        if (synataxSt.top() == '#' && synataxStr.front() != '#') {
+            cout << "预测分析栈先空了" << endl;
+            cout << "Synatax Error, Please Check." << endl;
+            errorSearch(tempStr);
+            return;
+        }
+        
+
+    }
+    cout << "Synatax is Correct." << endl;
+
+}
+
+// 错误检查
+void errorSearch(const deque<char>& synataxStr) {
+    int lparenCt = 0;int rparenCt = 0;
+    if (synataxStr.front() == '(') {
+        lparenCt++;
+    }
+    else if (synataxStr.front() == ')') {
+        rparenCt++;
+    }
+    char priorCh = synataxStr.front();
+    if (synataxStr.front() == '*' || synataxStr.front() == '/') {
+        cout << "Error Reason: nothing before * or /!" << endl;
+    }
+
+    if (synataxStr.back() == '*' || synataxStr.back() == '/') {
+        cout << "Error Reason: nothing after * or /!" << endl;
+    }
+
+    for (int i = 1;i < (int)synataxStr.size();i++) {
+        if (synataxStr[i] == priorCh && ((synataxStr[i] == '+' && priorCh == '+') || (synataxStr[i] == '-' && priorCh == '-')
+            || (synataxStr[i] == '*' && priorCh == '*') || (synataxStr[i] == '/' && priorCh == '/') )) {
+            cout << "Error Reason: Multile times " << synataxStr[i] << "!" << endl;
+        }
+        if (synataxStr[i] == priorCh && ((synataxStr[i] == 'b' && priorCh == 'b') || (synataxStr[i] == 'n' && priorCh == 'n'))) {
+            cout << "Error Reason: Multile times idents or number!"<< endl;
+        }
+        if (synataxStr[i] == ')' && (priorCh == '+' || priorCh == '-')) {
+            cout << "Error Reason: Unexpected + or - before )!" << endl;
+        }
+        if (synataxStr[i] == '(') {
+            lparenCt++;
+            if (lparenCt < rparenCt) {
+                cout << "Error Reason: rparenCt before lparenCt!" << endl;
+            }
+        }
+        else if (synataxStr[i] == ')') {
+            rparenCt++;
+            if (lparenCt < rparenCt) {
+                cout << "Error Reason: rparenCt before lparenCt!" << endl;
+            }
+        }
+        priorCh = synataxStr[i];
+    }
+
+    if (lparenCt != rparenCt) {
+        cout << "Error Reason: lparenNum doesn't equal to rparenNum!" << endl;
+    }
+
+}
+
+// predictTable[1][5] = "E->AIR";
+// predictTable[1][6] = "E->AIR";
+// predictTable[2][5] = "R->AIR";
+// predictTable[2][6] = "R->AIR";
+// predictTable[2][9] = "R->ε";
+// predictTable[3][1] = "I->FO";
+// predictTable[3][2] = "I->FO";
+// predictTable[3][3] = "I->FO";
+// predictTable[4][7] = "O->MFO";
+// predictTable[4][8] = "O->MFO";
+// predictTable[4][9] = "O->ε";
+// predictTable[5][1] = "F->b";
+// predictTable[5][2] = "F->n";
+// predictTable[5][3] = "F->(";
+// predictTable[6][5] = "A->+";
+// predictTable[6][6] = "A->-";
+// predictTable[7][7] = "M->*";
+// predictTable[7][8] = "M->/";
