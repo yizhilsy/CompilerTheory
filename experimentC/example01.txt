@@ -7,6 +7,7 @@ Begin
     write(A1,B2);
     2b:=num1+num2;
     {num}
+    if a3 = b3 then
 End.
 <=
 :=
