@@ -1,1 +1,9 @@
 if +a+(+a2+b2) = +a then
+if +a+(+a2+b2) = +a
+if +a+(+a2+b2) then
+if +a+b = +15 then
+if a*b+b = +a then
+if +15 = a2*b3 then
+if +a+b = 15 the
+if &a = (b*b) then
+if a <= a1 then

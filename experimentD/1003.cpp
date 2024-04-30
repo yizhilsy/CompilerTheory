@@ -114,7 +114,7 @@ int main()
     // }
     // ll1SyntaxAnalysis(compileFileStr);
 
-    cout << "*****Condition Syntax Test*****" << endl;
+    cout << "************Condition Syntax Test************" << endl;
     // 打开文件
     std::ifstream file("CompilerTheory\\experimentD\\synataxAnalysis02.txt");
     // 读取文件内容到一个 std::string 对象中
@@ -123,9 +123,32 @@ int main()
     file.close();
     // 将待编译文件全部转为小写字符
     transform(content02.begin(), content02.end(), content02.begin(), ::tolower);
-    cout << content02 << endl;
-    extractingIdentifiers(content02);
-    ll1ConditionSyntaxAnalysis(content02);
+    int condictionlineCt = 1;
+    string conditionCheckStr;
+    for (int i = 0;i < (int)content02.size();i++) {
+        if (content02[i] == '\n') {
+            cout << condictionlineCt++ << ":" << endl;
+            cout << conditionCheckStr << endl;
+            extractingIdentifiers(conditionCheckStr);
+            ll1ConditionSyntaxAnalysis(conditionCheckStr);
+            conditionCheckStr.clear();
+        }
+        else if (i == (int)content02.size() - 1) {
+            conditionCheckStr.push_back(content02[i]);
+            cout << condictionlineCt++ << ":" << endl;
+            cout << conditionCheckStr << endl;
+            extractingIdentifiers(conditionCheckStr);
+            ll1ConditionSyntaxAnalysis(conditionCheckStr);
+            conditionCheckStr.clear();
+        }
+        else {
+            conditionCheckStr.push_back(content02[i]);
+        }
+    }
+
+    // cout << content02 << endl;
+    // extractingIdentifiers(content02);
+    // ll1ConditionSyntaxAnalysis(content02);
 
     return 0;
 }
@@ -301,7 +324,7 @@ bool ll1SyntaxAnalysis(string& str) {
             predictTable[i][j] = "ERROR";
         }
     }
-    predictTable[1][1] = "I";predictTable[1][2] = "I";predictTable[1][3] = "I";predictTable[1][5] = "AIR";predictTable[1][6] = "AIR";
+    predictTable[1][1] = "IR";predictTable[1][2] = "IR";predictTable[1][3] = "IR";predictTable[1][5] = "AIR";predictTable[1][6] = "AIR";
     predictTable[2][4] = "ε";predictTable[2][5] = "AIR";predictTable[2][6] = "AIR";predictTable[2][9] = "ε";
     predictTable[3][1] = "FO";predictTable[3][2] = "FO";predictTable[3][3] = "FO";
     predictTable[4][4] = "ε";predictTable[4][5] = "ε";predictTable[4][6] = "ε";predictTable[4][7] = "MFO";predictTable[4][8] = "MFO";predictTable[4][9] = "ε";
@@ -508,9 +531,9 @@ bool ll1ConditionSyntaxAnalysis(string& str) {
     predictTable[2][5].pop_back();predictTable[2][5].push_back("E");predictTable[2][5].push_back("P");predictTable[2][5].push_back("E");
     predictTable[2][6].pop_back();predictTable[2][6].push_back("E");predictTable[2][6].push_back("P");predictTable[2][6].push_back("E");
     predictTable[2][15].pop_back();predictTable[2][15].push_back("odd");predictTable[2][15].push_back("E");
-    predictTable[3][1].pop_back();predictTable[3][1].push_back("I");
-    predictTable[3][2].pop_back();predictTable[3][2].push_back("I");
-    predictTable[3][3].pop_back();predictTable[3][3].push_back("I");
+    predictTable[3][1].pop_back();predictTable[3][1].push_back("I");predictTable[3][1].push_back("R");
+    predictTable[3][2].pop_back();predictTable[3][2].push_back("I");predictTable[3][2].push_back("R");
+    predictTable[3][3].pop_back();predictTable[3][3].push_back("I");predictTable[3][3].push_back("R");
     predictTable[3][5].pop_back();predictTable[3][5].push_back("A");predictTable[3][5].push_back("I");predictTable[3][5].push_back("R");
     predictTable[3][6].pop_back();predictTable[3][6].push_back("A");predictTable[3][6].push_back("I");predictTable[3][6].push_back("R");
     predictTable[4][4].pop_back();predictTable[4][4].push_back("ε");

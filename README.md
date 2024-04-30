@@ -6,7 +6,7 @@
 
 $$
 G[E]:\\
-E->I|AIR\\
+E->IR|AIR\\
 R->\epsilon|AIR\\
 I->FO\\
 O->\epsilon|MFO\\
@@ -20,7 +20,7 @@ $$
 G[E]:\\
 S-> if\ T\ then\\
 T->EPE|odd E\\
-E->I|AIR\\
+E->IR|AIR\\
 R->\epsilon|AIR\\
 I->FO\\
 O->\epsilon|MFO\\
@@ -35,15 +35,15 @@ $$
 
 判断表达式的预测分析表
 
-|   | b     | n     | (      | )               | +               | -               | *      | /      | #               |
-| - | ----- | ----- | ------ | --------------- | --------------- | --------------- | ------ | ------ | --------------- |
-| E | E->I  | E->I  | E->I   |                 | E->AIR          | E->AIR          |        |        |                 |
-| R |       |       |        | $R->\epsilon$ | R->AIR          | R->AIR          |        |        | $R->\epsilon$ |
-| I | I->FO | I->FO | I->FO  |                 |                 |                 |        |        |                 |
-| O |       |       |        | $O->\epsilon$ | $O->\epsilon$ | $O->\epsilon$ | O->MFO | O->MFO | $O->\epsilon$ |
-| F | F->b  | F->n  | F->(E) |                 |                 |                 |        |        |                 |
-| A |       |       |        |                 | A->+            | A->-            |        |        |                 |
-| M |       |       |        |                 |                 |                 | M->*   | M->/   |                 |
+|      | b     | n     | (      | )             | +             | -             | *      | /      | #             |
+| ---- | ----- | ----- | ------ | ------------- | ------------- | ------------- | ------ | ------ | ------------- |
+| E    | E->IR | E->IR | E->IR  |               | E->AIR        | E->AIR        |        |        |               |
+| R    |       |       |        | $R->\epsilon$ | R->AIR        | R->AIR        |        |        | $R->\epsilon$ |
+| I    | I->FO | I->FO | I->FO  |               |               |               |        |        |               |
+| O    |       |       |        | $O->\epsilon$ | $O->\epsilon$ | $O->\epsilon$ | O->MFO | O->MFO | $O->\epsilon$ |
+| F    | F->b  | F->n  | F->(E) |               |               |               |        |        |               |
+| A    |       |       |        |               | A->+          | A->-          |        |        |               |
+| M    |       |       |        |               |               |               | M->*   | M->/   |               |
 
 判断条件表达式的预测分析表
 
@@ -52,7 +52,7 @@ $$
 |      |      | b      | n      | (      | )             | +             | -             | *      | /      | =             | !=            | <             | <=            | >             | >=            | odd      | if            | then          | #    |
 | 1    | S    |        |        |        |               |               |               |        |        |               |               |               |               |               |               |          | S->if  T then |               |      |
 | 2    | T    | T->EPE | T->EPE | T->EPE |               | T->EPE        | T->EPE        |        |        |               |               |               |               |               |               | T->odd E |               |               |      |
-| 3    | E    | E->I   | E->I   | E->I   |               | E->AIR        | E->AIR        |        |        |               |               |               |               |               |               |          |               |               |      |
+| 3    | E    | E->IR  | E->IR  | E->IR  |               | E->AIR        | E->AIR        |        |        |               |               |               |               |               |               |          |               |               |      |
 | 4    | R    |        |        |        | $R->\epsilon$ | R->AIR        | R->AIR        |        |        | $R->\epsilon$ | $R->\epsilon$ | $R->\epsilon$ | $R->\epsilon$ | $R->\epsilon$ | $R->\epsilon$ |          |               | $R->\epsilon$ |      |
 | 5    | I    | I->FO  | I->FO  | I->FO  |               |               |               |        |        |               |               |               |               |               |               |          |               |               |      |
 | 6    | O    |        |        |        | $O->\epsilon$ | $O->\epsilon$ | $O->\epsilon$ | O->MFO | O->MFO | $O->\epsilon$ | $O->\epsilon$ | $O->\epsilon$ | $O->\epsilon$ | $O->\epsilon$ | $O->\epsilon$ |          |               | $O->\epsilon$ |      |
